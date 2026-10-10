@@ -1,3 +1,34 @@
+CREATE DATABASE project;
+USE project;
+
+CREATE TABLE pizza_types (
+    pizza_type_id VARCHAR(50),
+    name          VARCHAR(100),
+    category      VARCHAR(50),
+    ingredients   TEXT
+);
+
+CREATE TABLE pizzas (
+    pizza_id      VARCHAR(50),
+    pizza_type_id VARCHAR(50),
+    size          VARCHAR(5),
+    price         DECIMAL(6,2)
+);
+
+CREATE TABLE orders (
+    order_id INT,
+    date     DATE,
+    time     TIME
+);
+
+CREATE TABLE order_details (
+    order_details_id INT,
+    order_id         INT,
+    pizza_id         VARCHAR(50),
+    quantity         INT
+);
+
+
 use project;
 -- 1. Retrieve the total number of orders placed.
 select count(distinct order_id) from order_details;
@@ -23,7 +54,7 @@ order by order_count desc limit 1;
 -- 5. List the top 5 most ordered pizza types along with their quantities. 
 select name , count(quantity) as qty from order_details 
 join pizzas on order_details.pizza_id = pizzas.pizza_id 
-join pizza_type on pizzas.pizza_type_id = pizza_type.pizza_type_id
+join pizza_types on pizzas.pizza_type_id = pizza_types.pizza_type_id
 group by name
 order by qty desc limit 5;
 
@@ -31,7 +62,7 @@ order by qty desc limit 5;
 -- 6. Join the necessary tables to find the total quantity of each pizza category ordered. 
 select category , sum(quantity) as qty from order_details 
 join pizzas on order_details.pizza_id = pizzas.pizza_id 
-join pizza_type on pizzas.pizza_type_id = pizza_type.pizza_type_id
+join pizza_types on pizzas.pizza_type_id = pizza_types.pizza_type_id
 group by category
 order by qty desc;
 
@@ -45,8 +76,8 @@ order by hr ;
 
 -- 8. Join relevant tables to find the category-wise distribution of pizzas.
 select category , count(distinct order_details.order_id) from order_details join pizzas
-on order_details.pizza_id = pizzas.pizza_id join pizza_type
-on pizza_type.pizza_type_id = pizzas.pizza_type_id
+on order_details.pizza_id = pizzas.pizza_id join pizza_types
+on pizza_types.pizza_type_id = pizzas.pizza_type_id
 group by category
 order by category ;
 
@@ -62,7 +93,7 @@ join orders on order_details.order_id = orders.order_id ;
 
 -- 10. Determine the top 3 most ordered pizza types based on revenue.
 select name , round(sum(price*quantity)) as revenue from order_details join pizzas
-on order_details.pizza_id = pizzas.pizza_id join pizza_type
-on pizzas.pizza_type_id = pizza_type.pizza_type_id 
+on order_details.pizza_id = pizzas.pizza_id join pizza_types
+on pizzas.pizza_type_id = pizza_types.pizza_type_id 
 group by name 
 order by revenue desc limit 3; 
